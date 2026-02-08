@@ -1,0 +1,57 @@
+-- medicinal_leaf_db.sql
+CREATE DATABASE IF NOT EXISTS medicinal_leaf_db;
+USE medicinal_leaf_db;
+
+CREATE TABLE IF NOT EXISTS leaves (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  class_name VARCHAR(255) NOT NULL,
+  scientific_name VARCHAR(255),
+  common_name VARCHAR(255),
+  description TEXT,
+  uses TEXT
+);
+
+INSERT INTO leaves (class_name, scientific_name, common_name, description, uses) VALUES
+('Aloevera','Aloe vera','Aloe vera','Succulent plant with thick, fleshy leaves containing clear gel.','Skin soothing, burns, moisturizing.'),
+('Amla','Phyllanthus emblica','Amla (Indian gooseberry)','Small deciduous tree with vitamin C rich fruit.','Immunity, digestion, antioxidant.'),
+('Amruthaballi','Tinospora cordifolia','Giloy / Amruthaballi','Climbing shrub with heart-shaped leaves.','Immunity, fever support.'),
+('Bamboo','Bambusa spp.','Bamboo','Tall woody grass with lanceolate leaves.','Anti-inflammatory poultices.'),
+('Beans','Phaseolus vulgaris','Beans','Herb with edible pods.','Nutritional, protein source.'),
+('Bringaraja','Eclipta prostrata','Bhringraj','Creeping herb with small white flowers.','Hair health, liver tonic.'),
+('Castor','Ricinus communis','Castor','Large palmate leaves.','Castor oil for inflammation.'),
+('Chilly','Capsicum annuum','Chilli','Plant with conical fruits.','Capsaicin for pain relief.'),
+('Coffee','Coffea spp.','Coffee','Shrub with glossy leaves and coffee berries.','Stimulant, antioxidant.'),
+('Coriander','Coriandrum sativum','Coriander / Cilantro','Herb with feathery leaves.','Digestive aid.'),
+('Curry','Murraya koenigii','Curry leaf','Aromatic pinnate leaves.','Digestive health, antioxidant.'),
+('Doddapathre','Plectranthus amboinicus','Indian Borage','Succulent aromatic leaves.','Cold and cough relief.'),
+('Drumstick','Moringa oleifera','Moringa / Drumstick','Tree with pinnate, nutrient-dense leaves.','Nutrition, anti-inflammatory.'),
+('Ginger','Zingiber officinale','Ginger','Perennial herb with aromatic rhizome.','Digestion, anti-nausea, anti-inflammatory.'),
+('Guava','Psidium guajava','Guava','Tree with elliptic leaves.','Antidiarrheal, antimicrobial.'),
+('Hibiscus','Hibiscus rosa-sinensis','Hibiscus','Shrub with showy flowers.','Hair care, cardiovascular-support teas.'),
+('Honge','Pongamia pinnata','Karanja / Honge','Tree with pinnate leaves and oil-rich seeds.','Topical antimicrobial, skin treatments.'),
+('Jackfruit','Artocarpus heterophyllus','Jackfruit','Large evergreen tree with fleshy fruit.','Nutritive, wound dressings.'),
+('Jasmine','Jasminum spp.','Jasmine','Fragrant climbing shrub.','Aromatherapy, calming effects.'),
+('Kamakasturi','Murraya paniculata','Kamakasturi / Orange jasmine','Fragrant shrub with pinnate leaves.','Aromatic, calming traditional uses.'),
+('Lemon','Citrus limon','Lemon','Small evergreen tree with acidic fruit.','Vitamin C, digestive aid, antiseptic.'),
+('Lemongrass','Cymbopogon citratus','Lemongrass','Tall grass with lemon-scented foliage.','Digestive, calming, mild antimicrobial.'),
+('Mango','Mangifera indica','Mango','Large evergreen tree with alternate leaves and sweet fruit.','Wound applications, nutritive.'),
+('Marigold','Calendula officinalis','Marigold / Calendula','Flowering herb with bright petals.','Topical skin healing, anti-inflammatory.'),
+('Mint','Mentha spp.','Mint','Aromatic herb with menthol scent.','Digestive aid, nausea relief.'),
+('Neem','Azadirachta indica','Neem','Tree with pinnate bitter leaves.','Antimicrobial, antiseptic, dental hygiene.'),
+('Nerale','Syzygium cumini','Jambul / Nerale (approx.)','Tree with simple elliptical leaves and edible berries.','Traditional digestive uses, antioxidant.'),
+('Onion','Allium cepa','Onion','Bulbous plant with layered bulbs.','Topical poultices, anti-inflammatory.'),
+('Palak(Spinach)','Spinacia oleracea','Spinach / Palak','Leafy green vegetable rich in iron and vitamins.','Nutritional, supports anemia prevention.'),
+('Papaya','Carica papaya','Papaya','Small tree with lobed leaves and papain-rich fruit.','Papain for digestion, topical debridement.'),
+('Parijatha','Nyctanthes arbor-tristis','Parijatha','Fragrant tree with white flowers.','Fever reduction, digestive support.'),
+('Pepper','Piper nigrum','Black pepper','Climbing vine producing peppercorns.','Digestive stimulant, bioavailability enhancer.'),
+('Pomegranate','Punica granatum','Pomegranate','Fruit-bearing shrub with juicy arils.','Antioxidant, gastrointestinal support.'),
+('Pumpkin','Cucurbita pepo','Pumpkin','Vine with large lobed leaves and fruit.','Nutritional, antiparasitic seeds (traditional).'),
+('Raddish','Raphanus sativus','Radish','Root vegetable with pinnate leaves.','Digestive stimulant, expectorant.'),
+('Rose','Rosa spp.','Rose','Flowering shrub with fragrant petals.','Aromatherapy, skin soothing.'),
+('Sampige','Magnolia champaca','Champak / Sampige','Fragrant tree with glossy leaves and orange/yellow flowers.','Aromatic, calming, traditional uses.'),
+('Seethapala','Annona squamosa','Custard apple / Seethaphala','Tree with oblong leaves and sweet fruit.','Digestive support, nutritive.'),
+('Tamarind','Tamarindus indica','Tamarind','Leguminous tree with sour pods.','Digestive, mild laxative, culinary uses.'),
+('Thumbe','Leucas aspera','Thumbe','Small aromatic herb with linear leaves.','Respiratory relief, cough remedies.'),
+('Tomato','Solanum lycopersicum','Tomato','Vine plant with fleshy fruit rich in lycopene.','Antioxidant-rich, nutritive.'),
+('Tulsi','Ocimum tenuiflorum','Holy Basil / Tulsi','Aromatic herb with clove-like scent.','Respiratory, immune support, adaptogenic uses.'),
+('Turmeric','Curcuma longa','Turmeric','Rhizome-bearing herb with bright yellow pigment.','Anti-inflammatory, antioxidant, topical paste uses.');

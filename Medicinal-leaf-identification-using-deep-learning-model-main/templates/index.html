@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Medicinal Leaf Identification</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, #1abc9c 0, #0f172a 40%, #020617 100%);
+      color: #e5e7eb;
+      padding: 20px;
+      overflow-x: hidden; /* prevent any horizontal overflow */
+    }
+
+    .card {
+      width: 100%;
+      max-width: 1000px;            /* slightly smaller so everything fits */
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 24px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-block h1 {
+      font-size: 1.8rem;
+      letter-spacing: 0.03em;
+      color: #f9fafb;
+      margin-bottom: 6px;
+    }
+
+    .title-block p {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      max-width: 560px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: #6ee7b7;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: linear-gradient(to right, rgba(16, 185, 129, 0.18), rgba(15, 23, 42, 0.9));
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); /* keep both panels inside card */
+      gap: 20px;
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: radial-gradient(circle at top, rgba(30, 64, 175, 0.35), rgba(15, 23, 42, 0.95));
+      border-radius: 16px;
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(75, 85, 99, 0.6);
+      position: relative;
+      overflow: hidden;
+      width: 100%;             /* make sure panel never grows beyond card */
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title span.icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #4ade80, #15803d);
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+    }
+
+    .panel-subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .video-wrapper,
+    .canvas-wrapper {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    video,
+    canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: radial-gradient(circle at center, #0f172a, #020617);
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 3px 7px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button,
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      padding: 7px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      color: #022c22;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px rgba(34, 197, 94, 0.55);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background: rgba(31, 41, 55, 0.9);
+    }
+
+    .btn-soft {
+      background: rgba(20, 83, 45, 0.5);
+      color: #86efac;
+      border: 1px solid rgba(22, 163, 74, 0.6);
+    }
+
+    .btn-soft:hover:not(:disabled) {
+      background: rgba(22, 163, 74, 0.75);
+      color: #022c22;
+    }
+
+    .btn-danger {
+      background: rgba(127, 29, 29, 0.7);
+      border: 1px solid rgba(127, 29, 29, 0.9);
+      color: #fecaca;
+    }
+
+    .file-upload-area {
+      border-radius: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.8);
+      padding: 14px;
+      background: radial-gradient(circle at top, rgba(30, 64, 175, 0.35), rgba(15, 23, 42, 0.95));
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .file-upload-area label {
+      display: block;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .file-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .file-upload-row input[type="file"] {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      max-width: 260px;
+    }
+
+    .preview-wrapper {
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 10px;
+      align-items: stretch;
+      width: 100%;           /* keep inside panel */
+      max-width: 100%;
+    }
+
+    @media (max-width: 700px) {
+      .preview-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .preview-box {
+      border-radius: 10px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(circle at center, #020617, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 4/3;
+      width: 100%;
+    }
+
+    .preview-box canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .pill-label {
+      position: absolute;
+      top: 7px;
+      left: 7px;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      max-width: calc(100% - 14px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hint-text {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .footnote {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #6b7280;
+      text-align: right;
+    }
+
+    .accent {
+      color: #4ade80;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="title-block">
+        <h1>Medicinal Leaf Identification</h1>
+        <p>
+          Upload a leaf image or use your camera to capture one live. We’ll clean the image,
+          enhance it, simulate basic segmentation, and send it to the AI model for prediction.
+        </p>
+      </div>
+      <div class="tag">
+        AI · EfficientNetB0 · Leaf Species
+      </div>
+    </div>
+
+    <form id="leaf-form" action="/predict" method="post" enctype="multipart/form-data">
+      <!-- Hidden field Flask reads for webcam base64 -->
+      <input type="hidden" name="webcam_image" id="webcam_image" />
+
+      <div class="layout">
+        <!-- LEFT: Live Camera Capture -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">
+                <span class="icon"></span>
+                Live Camera Capture
+              </div>
+              <div class="panel-subtitle">Use your device camera to capture a leaf in real time.</div>
+            </div>
+          </div>
+
+          <div class="video-wrapper" id="video-container">
+            <video id="video" autoplay playsinline></video>
+            <div class="watermark">Live camera</div>
+          </div>
+
+          <div class="btn-row" style="margin-top: 12px;">
+            <button type="button" class="btn-ghost" id="start-camera-btn">Start Camera</button>
+            <button type="button" class="btn-soft" id="capture-btn" disabled>Capture Leaf</button>
+            <button type="button" class="btn-danger" id="reset-camera-btn" disabled>Reset</button>
+          </div>
+
+          <p class="hint-text">
+            Tip: Hold the leaf flat, fill most of the frame, and avoid harsh reflections.
+          </p>
+        </div>
+
+        <!-- RIGHT: Upload + Augmentation/Segmentation + Preview -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">
+                <span class="icon" style="background: radial-gradient(circle at 30% 0, #38bdf8, #1d4ed8);"></span>
+                Upload & AI Preprocessing
+              </div>
+              <div class="panel-subtitle">
+                Upload an image or use the captured photo. We’ll apply optional augmentation and a segmentation preview.
+              </div>
+            </div>
+          </div>
+
+          <div class="file-upload-area">
+            <label for="image">Upload a leaf image (JPG / PNG):</label>
+            <div class="file-upload-row">
+              <input type="file" name="image" id="image" accept="image/*" />
+              <span style="font-size: 0.75rem; color:#9ca3af;">
+                or use the <span class="accent">camera snapshot</span> on the left
+              </span>
+            </div>
+          </div>
+
+          <div class="preview-wrapper">
+            <div class="preview-box">
+              <span class="pill-label">Original / Captured</span>
+              <canvas id="originalCanvas"></canvas>
+            </div>
+            <div class="preview-box">
+              <span class="pill-label">Processed (Aug/Seg)</span>
+              <canvas id="processedCanvas"></canvas>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top: 10px;">
+            <button type="button" class="btn-soft" id="btn-enhance">Enhance Contrast</button>
+            <button type="button" class="btn-soft" id="btn-sharpen">Sharpen</button>
+            <button type="button" class="btn-soft" id="btn-segment">Segment Leaf (Green Mask)</button>
+            <button type="button" class="btn-ghost" id="btn-reset-aug">Reset Processing</button>
+          </div>
+
+          <p class="hint-text">
+            These processing steps run in your browser using simple image filters
+            (contrast, sharpening, and a green-channel based segmentation preview).
+            The final processed image will be sent to the server.
+          </p>
+
+          <div style="margin-top: 12px; display:flex; justify-content: space-between; align-items:center; gap:8px;">
+            <div class="hint-text">
+              When ready, click <span class="accent">Predict Leaf</span> to send the image to the AI model and database.
+            </div>
+            <button type="submit" class="btn-primary">
+              🔍 Predict Leaf
+            </button>
+          </div>
+
+          <div class="footnote">
+            Built with <span class="accent">TensorFlow · Keras · Flask</span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // --------------- DOM ELEMENTS ---------------
+    const video = document.getElementById("video");
+    const startCameraBtn = document.getElementById("start-camera-btn");
+    const captureBtn = document.getElementById("capture-btn");
+    const resetCameraBtn = document.getElementById("reset-camera-btn");
+    const webcamHiddenInput = document.getElementById("webcam_image");
+    const fileInput = document.getElementById("image");
+
+    const originalCanvas = document.getElementById("originalCanvas");
+    const processedCanvas = document.getElementById("processedCanvas");
+    const octx = originalCanvas.getContext("2d");
+    const pctx = processedCanvas.getContext("2d");
+
+    let stream = null;
+    let currentImageSource = null; // "camera" or "file"
+    let baseImageData = null;      // original image data for reset
+
+    // --------------- CAMERA HANDLING ---------------
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        video.srcObject = stream;
+        captureBtn.disabled = false;
+        resetCameraBtn.disabled = false;
+      } catch (err) {
+        console.error("Camera error:", err);
+        alert("Unable to access camera. Please allow camera permission or use file upload.");
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+      }
+      stream = null;
+      video.srcObject = null;
+      captureBtn.disabled = true;
+      resetCameraBtn.disabled = true;
+    }
+
+    function captureFromCamera() {
+      if (!stream) return;
+      const width = video.videoWidth || 640;
+      const height = video.videoHeight || 480;
+
+      originalCanvas.width = width;
+      originalCanvas.height = height;
+      processedCanvas.width = width;
+      processedCanvas.height = height;
+
+      octx.drawImage(video, 0, 0, width, height);
+      const imgData = octx.getImageData(0, 0, width, height);
+      baseImageData = imgData;
+      pctx.putImageData(imgData, 0, 0);
+
+      // Save to hidden base64 field for Flask webcam_image
+      const dataURL = originalCanvas.toDataURL("image/jpeg");
+      webcamHiddenInput.value = dataURL;
+      currentImageSource = "camera";
+
+     
+      fileInput.value = "";
+    }
+
+    function resetCameraAndPreview() {
+      stopCamera();
+      clearCanvases();
+      webcamHiddenInput.value = "";
+      currentImageSource = null;
+      baseImageData = null;
+    }
+
+    function clearCanvases() {
+      octx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+      pctx.clearRect(0, 0, processedCanvas.width, processedCanvas.height);
+    }
+
+    // --------------- FILE UPLOAD HANDLING ---------------
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const width = img.width;
+          const height = img.height;
+
+          originalCanvas.width = width;
+          originalCanvas.height = height;
+          processedCanvas.width = width;
+          processedCanvas.height = height;
+
+          octx.drawImage(img, 0, 0, width, height);
+          const imgData = octx.getImageData(0, 0, width, height);
+          baseImageData = imgData;
+          pctx.putImageData(imgData, 0, 0);
+
+          // When using file upload, clear webcam hidden field so Flask uses "image"
+          webcamHiddenInput.value = "";
+          currentImageSource = "file";
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // --------------- SIMPLE IMAGE FILTERS (Augmentation / Segmentation) ---------------
+    function applyEnhanceContrast() {
+      if (!baseImageData) return;
+      const imgData = new ImageData(new Uint8ClampedArray(baseImageData.data), baseImageData.width, baseImageData.height);
+      const data = imgData.data;
+      const factor = 1.2; // slight contrast boost
+      const brightness = 10;
+      for (let i = 0; i < data.length; i += 4) {
+        for (let c = 0; c < 3; c++) {
+          let v = data[i + c];
+          v = (v - 128) * factor + 128 + brightness;
+          data[i + c] = Math.max(0, Math.min(255, v));
+        }
+      }
+      pctx.putImageData(imgData, 0, 0);
+      updateHiddenIfCamera();
+    }
+
+    function applySharpen() {
+      if (!baseImageData) return;
+      const w = baseImageData.width;
+      const h = baseImageData.height;
+      const src = baseImageData.data;
+      const out = new Uint8ClampedArray(src.length);
+
+      const kernel = [
+        0, -1, 0,
+        -1, 5, -1,
+        0, -1, 0
+      ];
+
+      function index(x, y, channel) {
+        return (y * w + x) * 4 + channel;
+      }
+
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          for (let c = 0; c < 3; c++) {
+            let sum = 0;
+            let k = 0;
+            for (let ky = -1; ky <= 1; ky++) {
+              for (let kx = -1; kx <= 1; kx++) {
+                const px = x + kx;
+                const py = y + ky;
+                sum += src[index(px, py, c)] * kernel[k++];
+              }
+            }
+            out[index(x, y, c)] = Math.max(0, Math.min(255, sum));
+          }
+          out[index(x, y, 3)] = src[index(x, y, 3)];
+        }
+      }
+
+      const imgData = new ImageData(out, w, h);
+      pctx.putImageData(imgData, 0, 0);
+      updateHiddenIfCamera();
+    }
+
+    function applyGreenSegmentation() {
+      if (!baseImageData) return;
+      const imgData = new ImageData(new Uint8ClampedArray(baseImageData.data), baseImageData.width, baseImageData.height);
+      const data = imgData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        if (g > r + 10 && g > b + 10 && g > 60) {
+          data[i] = Math.min(255, r + 10);
+          data[i + 1] = Math.min(255, g + 20);
+          data[i + 2] = Math.min(255, b + 10);
+        } else {
+          const gray = (r + g + b) / 3;
+          const dark = gray * 0.2;
+          data[i] = dark;
+          data[i + 1] = dark;
+          data[i + 2] = dark;
+        }
+      }
+      pctx.putImageData(imgData, 0, 0);
+      updateHiddenIfCamera();
+    }
+
+    function resetProcessing() {
+      if (!baseImageData) return;
+      pctx.putImageData(baseImageData, 0, 0);
+      updateHiddenIfCamera();
+    }
+
+    function updateHiddenIfCamera() {
+      if (currentImageSource === "camera") {
+        const dataURL = processedCanvas.toDataURL("image/jpeg");
+        webcamHiddenInput.value = dataURL;
+      }
+    }
+
+    // --------------- EVENT LISTENERS ---------------
+    startCameraBtn.addEventListener("click", startCamera);
+    captureBtn.addEventListener("click", captureFromCamera);
+    resetCameraBtn.addEventListener("click", resetCameraAndPreview);
+
+    document.getElementById("btn-enhance").addEventListener("click", applyEnhanceContrast);
+    document.getElementById("btn-sharpen").addEventListener("click", applySharpen);
+    document.getElementById("btn-segment").addEventListener("click", applyGreenSegmentation);
+    document.getElementById("btn-reset-aug").addEventListener("click", resetProcessing);
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+
+tensorflow-cpu==2.15.0
+flask
+mysql-connector-python
+pillow
+opencv-python
+numpy==1.26.4
